@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LTG Messenger — Realistic Demo</title>
+<style>
+:root{
+ --bg:#07141f;--panel:#0b1d2b;--panel2:#10283a;--card:#0d2233;--line:#1c3a4e;
+ --text:#f2f8fb;--muted:#91aabd;--green:#19d39a;--green2:#0da879;--blue:#4aa3ff;
+ --danger:#ff5d73;--shadow:0 18px 60px #0007
+}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:Inter,Segoe UI,Arial,sans-serif;background:
+radial-gradient(circle at 10% 0,#123a4b,transparent 28%),radial-gradient(circle at 90% 100%,#123c35,transparent 28%),var(--bg);color:var(--text);overflow:hidden}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.app{height:100vh;max-width:1700px;margin:auto;display:grid;grid-template-columns:320px 1fr 310px;background:#06111bcc;backdrop-filter:blur(20px)}
+.sidebar,.info{background:#081a29e8;border-color:var(--line)}.sidebar{border-right:1px solid var(--line)}.info{border-left:1px solid var(--line)}
+.header{height:70px;padding:12px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.logo{height:42px;width:42px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#001a14;background:linear-gradient(135deg,var(--green),var(--blue));box-shadow:0 8px 30px #19d39a33}
+.brand{font-weight:800;font-size:18px}.brand small{display:block;font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-top:2px}.spacer{flex:1}
+.ib{width:38px;height:38px;border:0;border-radius:12px;background:transparent;color:var(--muted);transition:.2s}.ib:hover{background:var(--panel2);color:white;transform:translateY(-2px)}
+.search{padding:11px}.searchbox{display:flex;gap:9px;align-items:center;background:#071725;border:1px solid var(--line);border-radius:13px;padding:10px 12px}.searchbox input{width:100%;border:0;outline:0;color:white;background:transparent}
+.filter{display:flex;gap:5px;padding:0 11px 8px}.filter button{flex:1;border:0;border-radius:9px;padding:8px;background:transparent;color:var(--muted)}.filter .on{background:#123149;color:white}
+.chats{height:calc(100vh - 135px);overflow:auto;padding:4px 8px}.chat{display:flex;gap:11px;padding:11px 9px;border-radius:14px;cursor:pointer;position:relative}.chat:hover,.chat.active{background:#102a3e}.avatar{position:relative;width:46px;height:46px;min-width:46px;border-radius:15px;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#355c9a,#724b9b)}.dot{position:absolute;width:11px;height:11px;right:-1px;bottom:-1px;border:2px solid #091a29;border-radius:50%;background:var(--green)}.chatbody{min-width:0;flex:1}.row{display:flex;justify-content:space-between;gap:8px}.name{font-weight:700}.time{font-size:10px;color:var(--muted)}.preview{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}.badge{float:right;background:var(--green);color:#00281e;font-size:10px;font-weight:900;padding:2px 7px;border-radius:20px}
+
+.main{display:flex;flex-direction:column;min-width:0;background:linear-gradient(#092034aa,#061522ee)}.chathead{height:70px;display:flex;align-items:center;gap:11px;padding:10px 17px;border-bottom:1px solid var(--line);background:#081a29dd}.status{font-size:11px;color:var(--green);margin-top:3px}.actions{display:flex;gap:2px}
+.messages{flex:1;overflow:auto;padding:24px clamp(15px,7vw,100px);scroll-behavior:smooth;background-image:radial-gradient(#18364a22 1px,transparent 1px);background-size:22px 22px}
+.day{text-align:center;margin:5px 0 18px;color:var(--muted);font-size:11px}.day span{background:#102638cc;padding:6px 12px;border-radius:20px;border:1px solid var(--line)}
+.msg{display:flex;margin:9px 0;animation:enter .18s ease}.msg.me{justify-content:flex-end}.bubble{max-width:min(72%,650px);padding:10px 13px;border-radius:17px 17px 17px 5px;background:#102b40;border:1px solid #193e55;box-shadow:0 6px 18px #0002;word-wrap:break-word}.me .bubble{background:linear-gradient(135deg,#087765,#096c5e);border-radius:17px 17px 5px 17px;border-color:#15987f}.stamp{font-size:9px;color:#a9c4d2;text-align:right;margin-top:5px}.blue{color:#71d8ff}.filebubble{display:flex;gap:10px;align-items:center;min-width:220px}.fileicon{font-size:27px}.typing{font-size:11px;color:var(--muted);padding:0 0 8px 20px}
+.composer{display:flex;align-items:end;gap:6px;padding:11px 15px;border-top:1px solid var(--line);background:#071827}.compose{flex:1;background:#0c2436;border:1px solid var(--line);border-radius:16px;padding:6px 9px;display:flex;align-items:end}.compose textarea{width:100%;resize:none;max-height:110px;min-height:38px;border:0;outline:0;background:transparent;color:white;padding:7px}.send{width:45px;height:45px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--green),#21a8d2);font-size:18px;font-weight:900;color:#00251c;box-shadow:0 8px 24px #19d39a2a}.send:active{transform:scale(.94)}
+.infoBody{padding:20px}.profile{text-align:center}.big{width:92px;height:92px;margin:auto;border-radius:29px;display:grid;place-items:center;font-size:30px;font-weight:900;background:linear-gradient(135deg,#1aa27d,#486de3);box-shadow:0 18px 45px #19d39a22}.profile h2{margin:10px 0 4px}.muted{color:var(--muted);font-size:12px}.section{margin-top:22px}.section h4{text-transform:uppercase;letter-spacing:1.2px;color:#9bb3c8;font-size:10px}.item{padding:12px;border:1px solid var(--line);background:#0b2132;border-radius:12px;margin:7px 0;font-size:12px;cursor:pointer}.item:hover{background:#102b40}
+.modal{position:fixed;inset:0;display:none;place-items:center;background:#0009;backdrop-filter:blur(7px);z-index:20}.modal.show{display:grid}.box{width:min(460px,94vw);max-height:85vh;overflow:auto;background:#0b2031;border:1px solid var(--line);border-radius:22px;padding:21px;box-shadow:var(--shadow);animation:pop .2s}.box h2{margin:0 0 16px}.field{margin:12px 0}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}.field input,.field select{width:100%;padding:11px;border-radius:11px;border:1px solid var(--line);background:#071725;color:white;outline:0}.modalActions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.primary,.secondary{border:0;padding:10px 15px;border-radius:11px;font-weight:700}.primary{background:var(--green);color:#00271e}.secondary{background:#173047;color:white}
+.toast{position:fixed;right:18px;bottom:18px;padding:12px 15px;background:#102a3f;border:1px solid #2b526b;border-radius:13px;box-shadow:var(--shadow);opacity:0;transform:translateY(20px);transition:.25s;z-index:50}.toast.show{opacity:1;transform:none}
+.callOverlay{position:fixed;inset:0;display:none;place-items:center;background:radial-gradient(circle,#153d48,#020a11 70%);z-index:30}.callOverlay.show{display:grid}.callCard{text-align:center}.callAvatar{width:120px;height:120px;border-radius:38px;display:grid;place-items:center;margin:auto;background:linear-gradient(135deg,#1aa27d,#486de3);font-size:40px;font-weight:900;box-shadow:0 0 80px #19d39a44}.callCard h2{margin:18px 0 5px}.callBtns{display:flex;gap:15px;justify-content:center;margin-top:25px}.round{width:58px;height:58px;border:0;border-radius:50%;font-size:21px;background:#18364a;color:white}.end{background:var(--danger)!important}
+@keyframes enter{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+@media(max-width:1100px){.app{grid-template-columns:290px 1fr}.info{display:none}}@media(max-width:680px){.app{grid-template-columns:1fr}.sidebar{display:none}.messages{padding:18px 10px}.bubble{max-width:87%}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="header"><div class="logo">LT</div><div class="brand">LTG Messenger<small>MESSAGING PLATFORM</small></div><div class="spacer"></div><button class="ib" onclick="settings()">⚙️</button></div>
+ <div class="search"><div class="searchbox">🔎<input id="search" placeholder="Search conversations" oninput="searchChats()"></div></div>
+ <div class="filter"><button class="on" onclick="filterMode(this,'all')">All</button><button onclick="filterMode(this,'unread')">Unread</button></div>
+ <div class="chats" id="chats"></div>
+</aside>
+
+<main class="main">
+ <header class="chathead">
+  <div class="avatar" id="headAvatar">AR<span class="dot"></span></div>
+  <div><div class="name" id="headName">Aarav</div><div class="status" id="headStatus">online</div></div>
+  <div class="spacer"></div>
+  <div class="actions">
+   <button class="ib" onclick="startCall('voice')">📞</button><button class="ib" onclick="startCall('video')">🎥</button><button class="ib" onclick="openChatInfo()">ⓘ</button>
+  </div>
+ </header>
+ <section class="messages" id="messages"></section>
+ <div class="typing" id="typing" hidden>typing…</div>
+ <footer class="composer">
+  <button class="ib" onclick="filePicker.click()">📎</button>
+  <button class="ib" onclick="addEmoji()">😊</button>
+  <div class="compose"><textarea id="input" rows="1" placeholder="Message" onkeydown="handleKey(event)" oninput="resize(this)"></textarea></div>
+  <button class="send" onclick="send()">➤</button>
+ </footer>
+</main>
+
+<aside class="info">
+ <div class="header"><b>Contact info</b><div class="spacer"></div><button class="ib" onclick="toggleInfo()">×</button></div>
+ <div class="infoBody">
+  <div class="profile"><div class="big" id="bigAvatar">AR</div><h2 id="infoName">Aarav</h2><div class="muted" id="infoStatus">online</div></div>
+  <div class="section"><h4>Actions</h4><div class="item" onclick="toast('🔔 Notifications enabled')">🔔 Notifications</div><div class="item" onclick="pinChat()">📌 Pin conversation</div><div class="item" onclick="clearChat()">🗑️ Clear this chat</div></div>
+  <div class="section"><h4>Shared content</h4><div class="item" onclick="showShared('Photos')">🖼️ Photos & videos</div><div class="item" onclick="showShared('Documents')">📄 Documents</div><div class="item" onclick="showShared('Links')">🔗 Links</div></div>
+ </div>
+</aside>
+</div>
+
+<input id="filePicker" type="file" hidden onchange="attachFile(event)">
+<div class="modal" id="modal"><div class="box"><h2 id="modalTitle"></h2><div id="modalBody"></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" id="modalOk">Save</button></div></div></div>
+<div class="callOverlay" id="call"><div class="callCard"><div class="callAvatar" id="callAvatar">AR</div><h2 id="callName">Aarav</h2><div class="muted" id="callType">Calling…</div><div class="callBtns"><button class="round" onclick="toggleMute()">🎙️</button><button class="round end" onclick="endCall()">📵</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const defaultChats=[
+ {id:'aarav',name:'Aarav',initial:'AR',status:'online',unread:0,messages:[
+  {me:false,text:'Hey! Welcome to LTG Messenger 🚀',time:'09:00'},
+  {me:false,text:'This version saves your chats in the browser and supports real UI actions.',time:'09:01'},
+  {me:true,text:'Nice! It feels much more realistic now.',time:'09:04'},
+  {me:false,text:'Try sending a message, attaching a file, searching, calling or changing settings.',time:'09:05'}
+ ]},
+ {id:'neha',name:'Neha',initial:'NE',status:'last seen 2m ago',unread:2,messages:[{me:false,text:'Can you send the project file?',time:'08:52'}]},
+ {id:'gaming',name:'LTG Gaming',initial:'LG',status:'12 members',unread:8,messages:[{me:false,text:'Rahul: Tournament at 7 PM 🔥',time:'Yesterday'}]},
+ {id:'priya',name:'Priya',initial:'PR',status:'last seen today',unread:0,messages:[{me:false,text:'Voice message 🎤',time:'Mon'}]}
+];
+let chats=JSON.parse(localStorage.getItem('ltg_chats')||'null')||defaultChats;
+let currentId='aarav';
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem('ltg_chats',JSON.stringify(chats))}
+function current(){return chats.find(c=>c.id===currentId)}
+function renderChats(){
+ const q=$('search').value.toLowerCase();$('chats').innerHTML='';
+ chats.filter(c=>c.name.toLowerCase().includes(q)).forEach(c=>{
+  const last=c.messages[c.messages.length-1]?.text||'';
+  const el=document.createElement('div');el.className='chat '+(c.id===currentId?'active':'');el.dataset.id=c.id;
+  el.innerHTML=`<div class="avatar">${c.initial}${c.status==='online'?'<span class="dot"></span>':''}</div><div class="chatbody"><div class="row"><span class="name">${esc(c.name)}</span><span class="time">${c.messages.at(-1)?.time||''}</span></div><div class="preview">${esc(last)}</div>${c.unread?`<span class="badge">${c.unread}</span>`:''}</div>`;
+  el.onclick=()=>openChat(c.id);$('chats').appendChild(el);
+ })
+}
+function renderMessages(){
+ const c=current();$('messages').innerHTML='<div class="day"><span>Today</span></div>';
+ c.messages.forEach(m=>{
+  const el=document.createElement('div');el.className='msg '+(m.me?'me':'');
+  if(m.file) el.innerHTML=`<div class="bubble filebubble"><div class="fileicon">${m.type.startsWith('image/')?'🖼️':'📎'}</div><div><b>${esc(m.file)}</b><div class="stamp">${m.time}${m.me?' <span class="blue">✓✓</span>':''}</div></div></div>`;
+  else el.innerHTML=`<div class="bubble">${esc(m.text).replace(/\n/g,'<br>')}<div class="stamp">${m.time}${m.me?' <span class="blue">✓✓</span>':''}</div></div>`;
+  $('messages').appendChild(el);
+ });
+ $('messages').scrollTop=$('messages').scrollHeight;
+}
+function openChat(id){currentId=id;let c=current();c.unread=0;save();$('headName').textContent=c.name;$('headAvatar').firstChild.textContent=c.initial;$('headStatus').textContent=c.status;$('bigAvatar').textContent=c.initial;$('infoName').textContent=c.name;$('infoStatus').textContent=c.status;renderChats();renderMessages()}
+function send(){
+ const box=$('input'),text=box.value.trim();if(!text)return;let c=current();c.messages.push({me:true,text,time:now()});box.value='';resize(box);save();renderMessages();
+ $('typing').hidden=false;setTimeout(()=>{ $('typing').hidden=true; c.messages.push({me:false,text:'Message received 👍',time:now()});save();renderMessages()},900);
+}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}}
+function addEmoji(){$('input').value+=' 😊';$('input').focus();resize($('input'))}
+function resize(x){x.style.height='auto';x.style.height=Math.min(x.scrollHeight,110)+'px'}
+function attachFile(e){const f=e.target.files[0];if(!f)return;current().messages.push({me:true,file:f.name,type:f.type,time:now()});save();renderMessages();toast('📎 File attached: '+f.name);e.target.value=''}
+function now(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function searchChats(){renderChats()}
+function filterMode(btn,mode){document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');document.querySelectorAll('.chat').forEach(x=>x.style.display=mode==='all'||chats.find(c=>c.id===x.dataset.id)?.unread?'flex':'none')}
+function toast(t){let x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>x.classList.remove('show'),2200)}
+function openModal(title,body,ok){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modalOk').onclick=ok;$('modal').classList.add('show')}
+function closeModal(){$('modal').classList.remove('show')}
+function settings(){
+ openModal('LTG Messenger Settings',`
+ <div class="field"><label>Display name</label><input id="setName" value="LTG User"></div>
+ <div class="field"><label>Theme</label><select id="setTheme"><option value="default">Ocean Dark</option><option value="green">Green Night</option><option value="blue">Blue Night</option></select></div>
+ <div class="field"><label>Notifications</label><select><option>Enabled</option><option>Muted</option></select></div>`,
+ ()=>{document.title='LTG Messenger — '+($('setName').value||'User');let t=$('setTheme').value;if(t==='green')document.documentElement.style.setProperty('--blue','#20d9a6');if(t==='blue')document.documentElement.style.setProperty('--green','#4aa3ff');toast('⚙️ Settings saved');closeModal()});
+}
+function openChatInfo(){toast('Contact info is already open')}
+function toggleInfo(){toast('Info panel stays available on desktop')}
+function pinChat(){toast('📌 Conversation pinned')}
+function clearChat(){openModal('Clear conversation','<p class="muted">Remove all messages from this conversation? This cannot be undone.</p>',()=>{current().messages=[];save();renderMessages();closeModal();toast('Chat cleared')})}
+function showShared(type){openModal(type,'<p class="muted">No real '+type.toLowerCase()+' yet. Attach files in the chat to create shared content.</p>',closeModal)}
+function startCall(type){$('callName').textContent=current().name;$('callAvatar').textContent=current().initial;$('callType').textContent=type==='video'?'Starting video call…':'Calling…';$('call').classList.add('show');setTimeout(()=>$('callType').textContent=type==='video'?'Video call connected (demo)':'Voice call connected (demo)',800)}
+function endCall(){$('call').classList.remove('show');toast('📞 Call ended')}
+function toggleMute(){toast('🎙️ Microphone toggled')}
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()})
+renderChats();openChat('aarav');
+</script>
+</body>
+</html>
